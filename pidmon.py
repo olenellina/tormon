@@ -1,6 +1,7 @@
+from sys import argv
 import psutil
-pid = 1193
-if psutil.pid_exists(pid):
-    print("a process with pid %d exists" % pid)
+
+if psutil.pid_exists(int(argv[1])):
+    print("a process with pid %d exists" % int(argv[1]))
 else:
-    print("a process with pid %d does not exist" % pid)
+    print("a process with pid %d does not exist" % int(argv[1]))
