@@ -11,7 +11,8 @@ import os
 # General ping (so that if first two tests fail, I will no if the server is at least responsive)
 # Idea here is that, if one of these tests fail --> push notification generated to mobile app
 
-# Might still want a VERY basic cron job that tests for the Tor PID running and sends to API if not
+# Might still want a VERY basic cron job that tests for the Tor PID running and sends to API if not (YES)
+# Might want to get dynamic DNS or something to handle comcast changing WAN IP
 
 def tcp_test(server_info):
     # Really, what I want to do here is test specific ports associated with tor
@@ -21,6 +22,7 @@ def tcp_test(server_info):
         sock = socket()
         sock.connect((server_info[:cpos], int(server_info[cpos+1:])))
         sock.close
+        print('Tested succesfully')
         return True
     except:
         return False
@@ -44,17 +46,15 @@ def ping_test():
     else:
       print(hostname, 'is down!')
 
-def server_test(test_type, server_info):
+def server_test(server_info):
     # Again, don't think I want this script to be handed parameters - I will always want to test certain ports
-    if test_type.lower() == 'tcp':
-        ping_test()
-        return tcp_test(server_info)
-    elif test_type.lower() == 'http':
-        return http_test(server_info)
+    ping_test()
+    return tcp_test(server_info)
 
-# Will need more extensive error handling here --> this is where I will invoke *something* to generate push notificationsg
+
+# Will need more extensive error handling here --> this is where I will invoke *something* to generate push notifications
 if __name__ == '__main__':
-    if len(argv) != 3:
+    if len(argv) != 2:
         print('Wrong number of arguments.')
-    elif not server_test(argv[1], argv[2]):
+    elif not server_test(argv[1]):
         print('Unable to connect to the service.')
