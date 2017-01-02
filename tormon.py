@@ -3,6 +3,7 @@
 from urllib2 import urlopen
 from socket import socket
 from sys import argv
+import os
 
 # Tests that I will want:
 # Inbound port 80 (OrPort)
@@ -33,14 +34,25 @@ def http_test(server_info):
     except:
         return False
 
+def ping_test():
+    hostname = "google.com" #example
+    response = os.system("ping -c 1 " + hostname)
+
+    #and then check the response...
+    if response == 0:
+      print(hostname, 'is up!')
+    else:
+      print(hostname, 'is down!')
+
 def server_test(test_type, server_info):
     # Again, don't think I want this script to be handed parameters - I will always want to test certain ports
     if test_type.lower() == 'tcp':
+        ping_test()
         return tcp_test(server_info)
     elif test_type.lower() == 'http':
         return http_test(server_info)
 
-# Will need more extensive error handling here --> this is where I will invoke *something* to generate push notifications
+# Will need more extensive error handling here --> this is where I will invoke *something* to generate push notificationsg
 if __name__ == '__main__':
     if len(argv) != 3:
         print('Wrong number of arguments.')
