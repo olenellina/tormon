@@ -19,7 +19,7 @@ def tcp_test(server_info):
     # Really, what I want to do here is test specific ports associated with tor
     # I could have functions that test inbound over Tor ports
 
-    # This DOES test connectivity over a specified port
+    # This DOES test connectivity over a specified portg
     cpos = server_info.find(':')
     try:
         sock = socket()
