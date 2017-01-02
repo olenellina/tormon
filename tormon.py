@@ -13,10 +13,13 @@ import os
 
 # Might still want a VERY basic cron job that tests for the Tor PID running and sends to API if not (YES)
 # Might want to get dynamic DNS or something to handle comcast changing WAN IP
+# Script should allow people to define their own ports, so those should not be configured (instead passed by cron)
 
 def tcp_test(server_info):
     # Really, what I want to do here is test specific ports associated with tor
     # I could have functions that test inbound over Tor ports
+
+    # This DOES test connectivity over a specified port
     cpos = server_info.find(':')
     try:
         sock = socket()
@@ -27,28 +30,38 @@ def tcp_test(server_info):
     except:
         return False
 
-def http_test(server_info):
-    # The tor server is not a web server, so I don't think I need this function
-    # Maybe have a generic ping test here
-    try:
-        data = urlopen(server_info).read()
-        return True
-    except:
-        return False
+# Not sure this test is needed or what I would use it for:
+# def http_test(server_info):
+#     # The tor server is not a web server, so I don't think I need this function
+#     # Maybe have a generic ping test here
+#     try:
+#         data = urlopen(server_info).read()
+#         return True
+#     except:
+#         return False
 
-def ping_test():
+def ping_test(server_info):
     hostname = "google.com" #example
-    response = os.system("ping -c 1 " + hostname)
+
+    response = os.system("ping -c 1 " + server_info)
 
     #and then check the response...
     if response == 0:
-      print(hostname, 'is up!')
+      print(server_info, 'is up!')
     else:
-      print(hostname, 'is down!')
+      print(server_info, 'is down!')
+
+    # response = os.system("ping -c 1 " + hostname)
+    #
+    # #and then check the response...
+    # if response == 0:
+    #   print(hostname, 'is up!')
+    # else:
+    #   print(hostname, 'is down!')
 
 def server_test(server_info):
-    # Again, don't think I want this script to be handed parameters - I will always want to test certain ports
-    ping_test()
+    # I guess this is the main function that executes others?
+    ping_test(server_info)
     return tcp_test(server_info)
 
 
