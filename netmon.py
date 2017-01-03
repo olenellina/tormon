@@ -4,12 +4,11 @@ from socket import socket
 from sys import argv
 import os
 
-def port_test(server_info, port1, port2):
-    # This code will be updated to have tests for specific ports
-    # Note: also discuss with Rhett when/why to use Try/Except versus If/Else in Python
+def port_test(server_info, port):
+    # Note: Discuss with Rhett when/why to use Try/Except versus If/Else in Python
     try:
         sock = socket()
-        sock.connect((server_info, int(port1)))
+        sock.connect((server_info, int(port)))
         sock.close()
         return True
     except:
@@ -45,10 +44,14 @@ if __name__ == '__main__':
         print(argv[1], 'is down!')
 
     # Port Test:
-    if port_test(argv[1], argv[2], argv[3]):
+    if port_test(argv[1], argv[2]):
         print(argv[1], 'is accepting conections over port %s' % argv[2])
     else:
         print(argv[1], 'is NOT accepting conections over port %s' % argv[2])
+    if port_test(argv[1], argv[3]):
+        print(argv[1], 'is accepting conections over port %s' % argv[3])
+    else:
+        print(argv[1], 'is NOT accepting conections over port %s' % argv[3])
 
 
 # General Notes:
