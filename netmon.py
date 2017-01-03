@@ -15,8 +15,6 @@ def port_test(server_info, port):
         return False
 
 def ping_test(server_info):
-    # This code will handle the basic ping test
-    # Needs to be updated to strip away the port that is passed in currently
     response = os.system("ping -c 1 " + server_info)
 
     if response == 0:
@@ -31,7 +29,7 @@ def ping_test(server_info):
 #     return tcp_test(server_info)
 
 
-# Will need more extensive error handling here --> this is where I will invoke *something* to generate push notifications
+# This is where I will invoke *something* to generate push notifications, if a test fails
 if __name__ == '__main__':
     # Python considers calling the executable file with the host for testing as two arguments
     if len(argv) != 4:
