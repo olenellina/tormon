@@ -14,8 +14,12 @@ def pid_test(pid):
     else:
         return False
 
-def net_test():
+def net_io_test():
     result = psutil.net_io_counters()
+    print(result)
+
+def net_test():
+    result = psutil.net_connections(kind='tcp')
     print(result)
 
 if __name__ == '__main__':
@@ -29,4 +33,5 @@ if __name__ == '__main__':
         print("a process with pid %d does not exist" % int(pid))
         print("timestamp %s" % current_time)
 
+    net_io_test()
     net_test()
