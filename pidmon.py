@@ -7,8 +7,29 @@ from stem.util.system import pid_by_name
 import sys
 from stem.util.connection import get_connections, system_resolvers
 
-# So I think what I want to do here, is make a POST to the app engine backend with status & timestamp
-# I want this script to be called by cron every minute
+# Starting integration of PyFCM here:
+# Send to single device.
+from pyfcm import FCMNotification
+
+push_service = FCMNotification(api_key="<api-key>")
+
+# Your api-key can be gotten from:  https://console.firebase.google.com/project/<project-name>/settings/cloudmessaging
+
+registration_id = "<device registration_id>"
+message_title = "Uber update"
+message_body = "Hi john, your customized news for today is ready"
+result = push_service.notify_single_device(registration_id=registration_id, message_title=message_title, message_body=message_body)
+
+# Send to multiple devices by passing a list of ids.
+registration_ids = ["<device registration_id 1>", "<device registration_id 2>", ...]
+message_title = "Uber update"
+message_body = "Hope you're having fun this weekend, don't forget to check today's news"
+result = push_service.notify_multiple_devices(registration_ids=registration_ids, message_title=message_title, message_body=message_body)
+
+print result
+
+# End integration of PyFCM
+
 
 def pid_test():
     tor_pids = pid_by_name('tor', multiple = True)
@@ -30,7 +51,14 @@ def net_test():
     result = psutil.net_connections(kind='tcp')
     print(result)
 
-#### Tor Tests:
+if __name__ == '__main__':
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    net_io_test()
+    # net_test()
+    pid_test()
+
+#### Optional Tor Tests:
 
 # def pid_test2():
     # resolvers = system_resolvers()
@@ -49,17 +77,3 @@ def net_test():
     #   bytes_written = controller.get_info("traffic/written")
     #
     #   print("My Tor relay has read %s bytes and written %s." % (bytes_read, bytes_written))
-
-if __name__ == '__main__':
-    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    # if not pid_test():
-    #     print("a process with pid %d exists" % int(pid))
-    #     print("timestamp %s" % current_time)
-    # else:
-    #     print("a process with pid %d does not exist" % int(pid))
-    #     print("timestamp %s" % current_time)
-
-    net_io_test()
-    # net_test()
-    pid_test()
