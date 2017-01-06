@@ -53,12 +53,12 @@ def net_test():
 if __name__ == '__main__':
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    if not pid_test():
-        print("a process with pid %d exists" % int(pid))
-        print("timestamp %s" % current_time)
-    else:
-        print("a process with pid %d does not exist" % int(pid))
-        print("timestamp %s" % current_time)
+    # if not pid_test():
+    #     print("a process with pid %d exists" % int(pid))
+    #     print("timestamp %s" % current_time)
+    # else:
+    #     print("a process with pid %d does not exist" % int(pid))
+    #     print("timestamp %s" % current_time)
 
     net_io_test()
     # net_test()
