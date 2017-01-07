@@ -7,10 +7,12 @@ from stem.util.system import pid_by_name
 import sys
 from stem.util.connection import get_connections, system_resolvers
 import ConfigParser
+from pyfcm import FCMNotification
 
 # Configuring secure storage of API key:
 Config = ConfigParser.ConfigParser()
 Config.read("config.ini")
+
 def ConfigSectionMap(section):
     dict1 = {}
     options = Config.options(section)
@@ -25,28 +27,20 @@ def ConfigSectionMap(section):
     return dict1
 
 api_key = ConfigSectionMap("SectionOne")['api_key']
+registration_id = ConfigSectionMap("SectionOne")['reg_id']
 print api_key
+print registration_id
 
 # Starting integration of PyFCM here:
 # Send to single device.
-# from pyfcm import FCMNotification
-#
-# push_service = FCMNotification(api_key="<api-key>")
-#
-# # Your api-key can be gotten from:  https://console.firebase.google.com/project/<project-name>/settings/cloudmessaging
-#
-# registration_id = "<device registration_id>"
-# message_title = "Uber update"
-# message_body = "Hi john, your customized news for today is ready"
-# result = push_service.notify_single_device(registration_id=registration_id, message_title=message_title, message_body=message_body)
-#
-# # Send to multiple devices by passing a list of ids.
-# registration_ids = ["<device registration_id 1>", "<device registration_id 2>", ...]
-# message_title = "Uber update"
-# message_body = "Hope you're having fun this weekend, don't forget to check today's news"
-# result = push_service.notify_multiple_devices(registration_ids=registration_ids, message_title=message_title, message_body=message_body)
-#
-# print result
+
+push_service = FCMNotification(api_key=str(api_key))
+
+message_title = "Tor relay status"
+message_body = "Your relay is having some troubles"
+result = push_service.notify_single_device(registration_id=str(registration_id), message_title=message_title, message_body=message_body)
+
+print result
 
 # End integration of PyFCM
 
