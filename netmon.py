@@ -8,6 +8,9 @@
     # This does depend on the right ports being fed to it via Cron execution
     # This is just part of its normal heartbeat status
 
+# Next steps:
+# Once app engine is up and running, move this script there and include logic for alerting based on failures
+
 
 from socket import socket
 from sys import argv
