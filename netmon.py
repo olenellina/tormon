@@ -14,6 +14,7 @@
 
 from socket import socket
 from sys import argv
+from datetime import datetime
 import os
 
 # Port Test --> generates informational if return false (means some network latency)
@@ -37,6 +38,8 @@ def ping_test(server_info):
 
 
 if __name__ == '__main__':
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
     # Python considers calling the executable file with the host for testing as two arguments
     if len(argv) < 3:
         print('Wrong number of arguments.')
