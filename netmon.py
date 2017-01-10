@@ -28,6 +28,7 @@ def port_test(server_info, port):
         return False
 
 # Ping Test --> generates critical error if return false (means server is down or unreachable)
+# This test is probably not necessary, as I can do a cron run on the timestamps of the last heartbeat received 
 def ping_test(server_info):
     response = os.system("ping -c 1 " + server_info)
 

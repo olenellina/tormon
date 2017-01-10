@@ -88,8 +88,8 @@ if __name__ == '__main__':
 
     net_io_test()
     tor_net_test()
-    pid_test()
     flag_test()
+    pid_test()
 
 #### Optional Tor Tests:
 
