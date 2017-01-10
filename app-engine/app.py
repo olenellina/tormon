@@ -4,19 +4,30 @@ import webapp2
 
 from google.appengine.ext import ndb
 
-class Names(ndb.Model):
+class TorRelay(ndb.Model):
     name = ndb.StringProperty()
+    last_check_in = ndb.DateTimeProperty()
+    guard = ndb.BooleanProperty()
+    tor_pid = ndb.BooleanProperty()
+    responsive = ndb.BooleanProperty()
+    net_connections = ndb.IntegerProperty()
 
-class Heartbeats(ndb.Model):
-    # type pass in Python for empty blocks
-   pass
+class MonitoredData(ndb.Model):
+    tor_relay = ndb.KeyProperty(kind=TorRelay)
 
 class MainPageHandler(webapp2.RequestHandler):
+    # def get(self):
+    #     # Updates to database (probably a post)
+    #     name = self.request.get('q')
+    #     name_model = Name(name = name)
+    #     name_model.put()
+    #     self.response.out.write('Hello ' + self.request.get('q'))
+
     def get(self):
         # Updates to database (probably a post)
         name = self.request.get('q')
-        name_model = Names(name = name)
-        name_model.put()
+        TorRelay_model = TorRelay(name = name)
+        TorRelay_model.put()
         self.response.out.write('Hello ' + self.request.get('q'))
 
         # Android data pulls
