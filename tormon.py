@@ -69,7 +69,7 @@ def net_io_test():
 # Tor Secific Network Test
 def tor_net_test():
     # Stub pid, until Tor is running and integrated
-    # tor_pids.append(1056)
+    tor_pids.append(1056)
 
     all_traffic = psutil.net_connections(kind='tcp')
     for traffic in all_traffic:
@@ -90,6 +90,29 @@ if __name__ == '__main__':
     tor_net_test()
     flag_test()
     pid_test()
+
+# Potential Code for HTTP POST/Put/Get
+#
+# import httplib, urllib
+#
+# headers = {'X-API-TOKEN': 'your_token_here'}
+# payload = "'title'='value1'&'name'='value2'"
+#
+# conn = httplib.HTTPConnection("heise.de")
+# conn.request("POST", "", payload, headers)
+# response = conn.getresponse()
+#
+# print response
+#
+# OR
+# payload = {'username': 'bob', 'email': 'bob@bob.com'}
+# >>> r = requests.put("http://somedomain.org/endpoint", data=payload)
+# You can then check the response status code with:
+#
+# r.status_code
+# or the response with:
+#
+# r.content
 
 #### Optional Tor Tests:
 
