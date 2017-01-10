@@ -4,7 +4,7 @@ import webapp2
 
 from google.appengine.ext import ndb
 
-class TorRelay(ndb.Model):
+class TorRelays(ndb.Model):
     name = ndb.StringProperty()
     last_check_in = ndb.DateTimeProperty()
     guard = ndb.BooleanProperty()
@@ -13,7 +13,11 @@ class TorRelay(ndb.Model):
     net_connections = ndb.IntegerProperty()
 
 class MonitoredData(ndb.Model):
-    tor_relay = ndb.KeyProperty(kind=TorRelay)
+    tor_relay = ndb.KeyProperty(kind=TorRelays)
+
+class Names(ndb.Model):
+    name = ndb.StringProperty()
+
 
 class MainPageHandler(webapp2.RequestHandler):
     # def get(self):
@@ -23,14 +27,30 @@ class MainPageHandler(webapp2.RequestHandler):
     #     name_model.put()
     #     self.response.out.write('Hello ' + self.request.get('q'))
 
+    # def get(self):
+    #     # Updates to database (probably a post)
+    #     name = self.request.get('q')
+    #     name_model = TorRelays(name = name)
+    #     name_model.put()
+    #     self.response.out.write('Hello ' + self.request.get('q'))
+
     def get(self):
-        # Updates to database (probably a post)
         name = self.request.get('q')
-        TorRelay_model = TorRelay(name = name)
-        TorRelay_model.put()
+        name_model = Names(name = name)
+        name_model.put()
         self.response.out.write('Hello ' + self.request.get('q'))
 
         # Android data pulls
+
+    # def put(self):
+    #     heartbeat = journal.Entry(
+    #         user=user,
+    #         key_name=user_id + ':' + str(ujd.last_entry),
+    #         start_time=start_time,
+    #         text=text,
+    #         end_time=end_time,
+    #         source=source)
+    #     entry.put()
 
 # Web App 2 framework stuff (when a request comes in on this path, had it off to this thing):
 app = webapp2.WSGIApplication([
