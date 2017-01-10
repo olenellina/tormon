@@ -15,28 +15,12 @@ class TorRelays(ndb.Model):
 class MonitoredData(ndb.Model):
     tor_relay = ndb.KeyProperty(kind=TorRelays)
 
-class Names(ndb.Model):
-    name = ndb.StringProperty()
-
-
 class MainPageHandler(webapp2.RequestHandler):
-    # def get(self):
-    #     # Updates to database (probably a post)
-    #     name = self.request.get('q')
-    #     name_model = Name(name = name)
-    #     name_model.put()
-    #     self.response.out.write('Hello ' + self.request.get('q'))
-
-    # def get(self):
-    #     # Updates to database (probably a post)
-    #     name = self.request.get('q')
-    #     name_model = TorRelays(name = name)
-    #     name_model.put()
-    #     self.response.out.write('Hello ' + self.request.get('q'))
 
     def get(self):
+        # Updates to database (probably a post)
         name = self.request.get('q')
-        name_model = Names(name = name)
+        name_model = TorRelays(name = name)
         name_model.put()
         self.response.out.write('Hello ' + self.request.get('q'))
 
