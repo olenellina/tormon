@@ -51,6 +51,7 @@ def flag_test():
     user_traffic = stem.control.UserTrafficAllowed
     print(user_traffic)
 
+# Function that will handle packaging and sending of data to app engine:
 def appengine_send():
     payload = {'name': 'bob'}
     r = requests.get("http://torrelaymonitoring.appspot.com/?q=bob")
