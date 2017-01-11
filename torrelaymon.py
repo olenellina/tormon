@@ -23,6 +23,7 @@ def pid_test():
 
     if not tor_pids:
         print("Unable to get tor's pid. Is it running?")
+
         sys.exit(1)
     elif len(tor_pids) > 1:
         print("You're running %i instances of tor, picking the one with pid %i" % (len(tor_pids), tor_pids[0]))
@@ -53,8 +54,8 @@ def flag_test():
 
 # Function that will handle packaging and sending of data to app engine:
 def appengine_send():
-    payload = {'name': 'bob'}
-    r = requests.get("http://torrelaymonitoring.appspot.com/?q=bob")
+    # r = requests.get("http://torrelaymonitoring.appspot.com/?q=stotle")
+    r = requests.get("http://torrelaymonitoring.appspot.com/?name=stotle&tor_pid=True")
 
     print(r.status_code)
     print(r.content)
@@ -63,6 +64,7 @@ def appengine_send():
 if __name__ == '__main__':
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     tor_pids = []
+    payload = {}
 
     net_io_test()
     tor_net_test()
@@ -70,21 +72,6 @@ if __name__ == '__main__':
     appengine_send()
     pid_test()
 
-
-# Potential Code for HTTP POST/Put/Get
-#
-# import httplib, urllib
-#
-# headers = {'X-API-TOKEN': 'your_token_here'}
-# payload = "'title'='value1'&'name'='value2'"
-#
-# conn = httplib.HTTPConnection("heise.de")
-# conn.request("POST", "", payload, headers)
-# response = conn.getresponse()
-#
-# print response
-#
-# OR
 
 #### Optional Tor Tests:
 
