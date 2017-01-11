@@ -30,10 +30,11 @@ class MainPageHandler(webapp2.RequestHandler):
         self.response.out.write('Hello ' + self.request.get('q'))
         # self.fail_check(heartbeat)
         title = "hello there"
-        fcm_send(title)
+        heartbeat_check(name)
 
-    # def fail_check(self, heartbeat):
-    #     pass
+def heartbeat_check(name):
+    if name != "bob":
+        fcm_send(name + ' is not correct')
 
 def fcm_send(title):
     push_service = FCMNotification(api_key="")
