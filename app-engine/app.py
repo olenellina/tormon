@@ -14,27 +14,59 @@ class TorRelays(ndb.Model):
 class Heartbeats(ndb.Model):
     tor_relay = ndb.KeyProperty(kind=TorRelays)
     name = ndb.StringProperty()
+    # This is not something I want to pass in the heartbeat but set when the heartbeat received
     last_check_in = ndb.DateTimeProperty()
-    guard = ndb.BooleanProperty()
+    # I'll add this once I can figure out how to get this info from Tor
+    # guard = ndb.BooleanProperty()
     tor_pid = ndb.BooleanProperty()
-    responsive = ndb.BooleanProperty()
     net_connections = ndb.IntegerProperty()
 
 class MainPageHandler(webapp2.RequestHandler):
 
     def get(self):
         # Updates to database (probably a post)
-        name = self.request.get('q')
+        name = self.request.get('name')
         name_model = Heartbeats(name = name)
         name_model.put()
-        self.response.out.write('Hello ' + self.request.get('q'))
+        tor_pid = self.request.get('tor_pid')
+        if tor_pid == "True":
+            tor_pid = True
+        else:
+            tor_pid = False
+        tor_pid_model = Heartbeats(tor_pid = tor_pid)
+        tor_pid_model.put()
+        self.response.out.write('Hello ' + name + ' Your Tor Pid is: ' + str(tor_pid))
         # self.fail_check(heartbeat)
         title = "hello there"
-        heartbeat_check(name)
+        heartbeat_check(name, tor_pid)
 
-def heartbeat_check(name):
+    def post(self):
+        # Updates to database (probably a post)
+        name = self.request.get('name')
+        name_model = Heartbeats(name = name)
+        name_model.put()
+        tor_pid = self.request.get('tor_pid')
+        if tor_pid == "True":
+            tor_pid = True
+        else:
+            tor_pid = False
+        tor_pid_model = Heartbeats(tor_pid = tor_pid)
+        tor_pid_model.put()
+        self.response.out.write('Hello ' + name + ' Your Tor Pid is: ' + str(tor_pid))
+        # self.fail_check(heartbeat)
+        title = "hello there"
+        heartbeat_check(name, tor_pid)
+
+def heartbeat_check(name, tor_pid):
+    net_connections = 4
+
     if name != "bob":
         fcm_send(name + ' is not correct')
+    if tor_pid == False:
+        fcm_send('Tor process is down')
+    if net_connections < 3:
+        fcm_send('Drop in Tor traffic')
+
 
 def fcm_send(title):
     push_service = FCMNotification(api_key="")
@@ -66,7 +98,7 @@ app = webapp2.WSGIApplication([
           # # Skip if the user has not registered for GCM
           # if len(ujd.registration_ids) == 0:
           #   return
-          # gcmPush = {
+          # heartbeat = {
           #   # No need to send every message, we only send a message saying we need to
           #   # sync.
           #   "collapse_key": "new_entry",
@@ -76,7 +108,7 @@ app = webapp2.WSGIApplication([
           # }
           # response = urlfetch.fetch(
           #     url="https://android.googleapis.com/gcm/send",
-          #     payload=json.dumps(gcmPush),
+          #     payload=json.dumps(heartbeat),
           #     method=urlfetch.POST,
           #     headers={
           #         'Content-Type': 'application/json',
