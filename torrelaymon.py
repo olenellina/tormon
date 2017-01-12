@@ -39,7 +39,7 @@ def net_io_test():
 def tor_net_test():
     # Stub pid, until Tor is running and integrated
     tor_net_connections = 0
-    tor_pids.append(1056)
+    # tor_pids.append(1056)
 
     all_traffic = psutil.net_connections(kind='tcp')
     for traffic in all_traffic:
@@ -60,41 +60,10 @@ def appengine_send():
 
 if __name__ == '__main__':
     tor_pids = []
-    data = {'name': 'Thuum', 'tor_pid': None, 'net_connections': None}
+    data = {'name': 'Dovahkin', 'tor_pid': None, 'net_connections': None}
 
     net_io_test()
     tor_net_test()
     flag_test()
     pid_test()
     appengine_send()
-
-######## BEGIN POST INTEGRATION:
-# https://cloud.google.com/appengine/docs/python/issue-requests
-# import urllib2
-# url = 'http://torrelaymonitoring.appspot.com/?name=stotle&tor_pid=False'
-# try:
-#     result = urllib2.urlopen(url)
-#     self.response.write(result.read())
-# except urllib2.URLError:
-#     logging.exception('Caught exception fetching url')
-
-
-#### Optional Tor Tests:
-
-# def pid_test2():
-    # resolvers = system_resolvers()
-    #
-    # if not resolvers:
-    #   print("Stem doesn't support any connection resolvers on our platform.")
-    #   sys.exit(1)
-    #
-    # picked_resolver = resolvers[0]  # lets just opt for the first
-    # print("Our platform supports connection resolution via: %s (picked %s)" % (', '.join(resolvers), picked_resolver))
-
-    # with Controller.from_port(port = 9051) as controller:
-    #   controller.authenticate()  # provide the password here if you set one
-    #
-    #   bytes_read = controller.get_info("traffic/read")
-    #   bytes_written = controller.get_info("traffic/written")
-    #
-    #   print("My Tor relay has read %s bytes and written %s." % (bytes_read, bytes_written))
