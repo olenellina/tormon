@@ -23,6 +23,7 @@ def pid_test():
 
     if not tor_pids:
         print("Unable to get tor's pid. Is it running?")
+        appengine_send(False)
 
         sys.exit(1)
     elif len(tor_pids) > 1:
@@ -53,15 +54,17 @@ def flag_test():
     print(user_traffic)
 
 # Function that will handle packaging and sending of data to app engine:
-def appengine_send():
-    # r = requests.get("http://torrelaymonitoring.appspot.com/?q=stotle")
-    r = requests.get("http://torrelaymonitoring.appspot.com/?name=stotle&tor_pid=True")
+def appengine_send(tor_pid):
+    # r = requests.get("http://torrelaymonitoring.appspot.com/?q=stotle")]
+    if tor_pid == False:
+        r = requests.post("http://torrelaymonitoring.appspot.com/?name=stotle&tor_pid=False")
 
     print(r.status_code)
     print(r.content)
 
 
 if __name__ == '__main__':
+    # Perhaps run all of the tests which builds the payload and then call appengine_send at the bottom of this list
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     tor_pids = []
     payload = {}
@@ -69,8 +72,18 @@ if __name__ == '__main__':
     net_io_test()
     tor_net_test()
     flag_test()
-    appengine_send()
+    # appengine_send()
     pid_test()
+
+######## BEGIN POST INTEGRATION:
+# https://cloud.google.com/appengine/docs/python/issue-requests
+# import urllib2
+# url = 'http://torrelaymonitoring.appspot.com/?name=stotle&tor_pid=False'
+# try:
+#     result = urllib2.urlopen(url)
+#     self.response.write(result.read())
+# except urllib2.URLError:
+#     logging.exception('Caught exception fetching url')
 
 
 #### Optional Tor Tests:
