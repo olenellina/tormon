@@ -13,24 +13,18 @@ class TorRelays(ndb.Model):
 class Heartbeats(ndb.Model):
     # tor_relay = ndb.KeyProperty(kind=TorRelays)
     name = ndb.StringProperty()
-    # This is not something I want to pass in the heartbeat but set when the heartbeat received
     last_check_in = ndb.DateTimeProperty()
-    # I'll add this once I can figure out how to get this info from Tor
     # guard = ndb.BooleanProperty()
     tor_pid = ndb.BooleanProperty()
     net_connections = ndb.IntegerProperty()
 
 class MainPageHandler(webapp2.RequestHandler):
     def get(self):
-        # q = get_records()
-        # q = Heartbeats.query().order(Heartbeats.name)
-        # self.response.out.write(str(q))
         query = Heartbeats.query()
         last = query.order(-Heartbeats.last_check_in).get()
         self.response.out.write(str(last))
 
     def post(self):
-        # Updates to database (probably a post)
         name = self.request.get('name')
         heartbeat = Heartbeats(name = name)
         if self.request.get('tor_pid') == "True":
@@ -38,18 +32,17 @@ class MainPageHandler(webapp2.RequestHandler):
         else:
             pid = False
         heartbeat.tor_pid = pid
-        # heartbeat.last_check_in = str(datetime.now())
-        heartbeat.net_connections = int(self.request.get('net_connections'))
+        heartbeat.last_check_in = datetime.now()
+        connections = int(self.request.get('net_connections'))
+        heartbeat.net_connections = connections
         heartbeat.put()
         self.response.out.write('Hello ' + name + ' Your Tor Pid is: ' + str(pid))
         heartbeat_check(name, pid)
 
-def heartbeat_check(name, pid):
-    net_connections = 4
-
+def heartbeat_check(connections, pid):
     if pid == False:
         fcm_send('Tor process is down')
-    if net_connections < 3:
+    elif connections < 3:
         fcm_send('Drop in Tor traffic')
 
 def fcm_send(title):
@@ -59,9 +52,6 @@ def fcm_send(title):
     message_body = title
     firebase_response = push_service.notify_single_device(registration_id="", message_title=message_title, message_body=message_body)
 
-@db.transactional
-def get_records():
-    return Heartbeats.get_by_id(6315704580046848)
 
 # Web App 2 framework stuff (when a request comes in on this path, hand it off to this thing):
 app = webapp2.WSGIApplication([
