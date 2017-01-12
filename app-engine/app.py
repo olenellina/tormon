@@ -1,8 +1,8 @@
 import webapp2
 from pyfcm import FCMNotification
 import socket
+from datetime import datetime
 from google.appengine.ext import db
-
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 
@@ -17,55 +17,37 @@ class Heartbeats(ndb.Model):
     last_check_in = ndb.DateTimeProperty()
     # I'll add this once I can figure out how to get this info from Tor
     # guard = ndb.BooleanProperty()
-    tor_pid = ndb.BooleanProperty(required=True)
+    tor_pid = ndb.BooleanProperty()
     net_connections = ndb.IntegerProperty()
 
 class MainPageHandler(webapp2.RequestHandler):
     def get(self):
-        q = get_records()
-        self.response.out.write(q)
-        # Updates to database (probably a post)
-        # name = self.request.get('name')
-        # name_model = Heartbeats(name = name)
-        # name_model.put()
-        # tor_pid = self.request.get('tor_pid')
-        # if tor_pid == "True":
-        #     tor_pid = True
-        # else:
-        #     tor_pid = False
-        # tor_pid_model = Heartbeats(tor_pid = tor_pid)
-        # tor_pid_model.put()
-        # heartbeats_all = Heartbeats.all()
-        # self.response.out.write('Here are the heartbeast ' + heartbeats_all)
-        # # self.fail_check(heartbeat)
-        # title = "hello there"
-        # heartbeat_check(name, tor_pid)
-        # relays = get_all(Heartbeats)
-        # self.response.out.write(relays)
+        # q = get_records()
+        # q = Heartbeats.query().order(Heartbeats.name)
+        # self.response.out.write(str(q))
+        query = Heartbeats.query()
+        last = query.order(-Heartbeats.last_check_in).get()
+        self.response.out.write(str(last))
 
     def post(self):
         # Updates to database (probably a post)
         name = self.request.get('name')
-        name_model = Heartbeats(name = name)
-        name_model.put()
-        tor_pid = self.request.get('tor_pid')
-        if tor_pid == "True":
-            tor_pid = True
+        heartbeat = Heartbeats(name = name)
+        if self.request.get('tor_pid') == "True":
+            pid = True
         else:
-            tor_pid = False
-        tor_pid_model = Heartbeats(tor_pid = tor_pid)
-        tor_pid_model.put()
-        self.response.out.write('Hello ' + name + ' Your Tor Pid is: ' + str(tor_pid))
-        # self.fail_check(heartbeat)
-        title = "hello there"
-        heartbeat_check(name, tor_pid)
+            pid = False
+        heartbeat.tor_pid = pid
+        # heartbeat.last_check_in = str(datetime.now())
+        heartbeat.net_connections = int(self.request.get('net_connections'))
+        heartbeat.put()
+        self.response.out.write('Hello ' + name + ' Your Tor Pid is: ' + str(pid))
+        heartbeat_check(name, pid)
 
-def heartbeat_check(name, tor_pid):
+def heartbeat_check(name, pid):
     net_connections = 4
 
-    if name != "bob":
-        fcm_send(name + ' is not correct')
-    if tor_pid == False:
+    if pid == False:
         fcm_send('Tor process is down')
     if net_connections < 3:
         fcm_send('Drop in Tor traffic')
