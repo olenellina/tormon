@@ -1,0 +1,5 @@
+cron:
+- description: server status check
+  url: /status
+  # target: beta
+  schedule: every 10 mins
