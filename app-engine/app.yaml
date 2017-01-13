@@ -5,6 +5,8 @@ api_version: 1
 threadsafe: true
 
 handlers:
+- url: /status
+  script: status.py
 - url: /.*
   script: app.app
 
