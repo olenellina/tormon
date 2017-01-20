@@ -6,7 +6,7 @@ threadsafe: true
 
 handlers:
 - url: /status
-  script: status.py
+  script: status.status
 - url: /.*
   script: app.app
 
