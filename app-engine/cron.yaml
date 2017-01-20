@@ -2,4 +2,4 @@ cron:
 - description: server status check
   url: /status
   # target: beta
-  schedule: every 10 mins
+  schedule: every 1 mins
