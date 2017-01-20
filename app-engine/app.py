@@ -6,6 +6,9 @@ from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 
+# Create an alert attribute that I flip/flop based on notification status
+# Prevents mutliple alerts from driving someone crazy if they already know something is down
+
 # Ask Rhett to explain datastore model
 class TorRelays(ndb.Model):
     name = ndb.StringProperty()
@@ -19,6 +22,7 @@ class Heartbeats(ndb.Model):
     net_connections = ndb.IntegerProperty()
 
 class MainPageHandler(webapp2.RequestHandler):
+    # JSON.dumps(status data) --> look at class entry_to_object
     def get(self):
         query = Heartbeats.query()
         last = query.order(-Heartbeats.last_check_in).get()
@@ -42,6 +46,8 @@ class MainPageHandler(webapp2.RequestHandler):
 def heartbeat_check(connections, pid):
     if pid == False:
         fcm_send('Tor process is down')
+    # Compare this to previous heartbeat (drop/change -> new will be low)
+    # What I really want is bandwidth measure
     elif connections < 3:
         fcm_send('Drop in Tor traffic')
 
