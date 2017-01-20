@@ -39,11 +39,12 @@ def net_io_test():
 def tor_net_test():
     # Stub pid, until Tor is running and integrated
     tor_net_connections = 0
-    # tor_pids.append(1056)
+    tor_pids.append(1056)
 
     all_traffic = psutil.net_connections(kind='tcp')
     for traffic in all_traffic:
         if traffic.pid in tor_pids:
+            print(traffic)
             tor_net_connections += 1
     data['net_connections'] = tor_net_connections
 
@@ -55,12 +56,13 @@ def flag_test():
 # Function that will handle packaging and sending of data to app engine:
 def appengine_send():
     r = requests.post("http://torrelaymonitoring.appspot.com", data=data)
+    # r = requests.post("http://localhost:8080", data=data)
     print(r.status_code)
     print(r.content)
 
 if __name__ == '__main__':
     tor_pids = []
-    data = {'name': 'Dovahkin', 'tor_pid': None, 'net_connections': None}
+    data = {'name': 'Obama', 'tor_pid': None, 'net_connections': None}
 
     net_io_test()
     tor_net_test()
