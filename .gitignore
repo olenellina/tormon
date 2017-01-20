@@ -17,6 +17,9 @@
 # Used by dotenv library to load environment variables.
 *.env
 
+# Excludes app engine local server files
+*.pyc
+
 
 ## Specific to RubyMotion:
 .dat*
