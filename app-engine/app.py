@@ -5,6 +5,7 @@ from datetime import datetime
 from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
+import json
 
 # Create an alert attribute that I flip/flop based on notification status
 # Prevents mutliple alerts from driving someone crazy if they already know something is down
@@ -20,15 +21,25 @@ class Heartbeats(ndb.Model):
     # guard = ndb.BooleanProperty()
     tor_pid = ndb.BooleanProperty()
     net_connections = ndb.IntegerProperty()
+    issue_detected = ndb.BooleanProperty()
 
 class MainPageHandler(webapp2.RequestHandler):
-    # JSON.dumps(status data) --> look at class entry_to_object
+    # JSON.dumps(status data) --> look at class entry_to_object65785467095767-94
     def get(self):
         query = Heartbeats.query()
         last = query.order(-Heartbeats.last_check_in).get()
-        self.response.out.write(str(last))
+        last_check = last.last_check_in.strftime('%m/%d/%Y %H:%M:%S %Z')
+        dmp = {
+        "name": last.name,
+        "check_in": last_check,
+        "tor_pid": last.tor_pid,
+        "net_connections": last.net_connections
+        }
+        self.response.out.write(json.dumps(dmp))
 
     def post(self):
+        query = Heartbeats.query()
+        pre_entry = query.order(-Heartbeats.last_check_in).get()
         name = self.request.get('name')
         heartbeat = Heartbeats(name = name)
         if self.request.get('tor_pid') == "True":
@@ -38,18 +49,31 @@ class MainPageHandler(webapp2.RequestHandler):
         heartbeat.tor_pid = pid
         heartbeat.last_check_in = datetime.now()
         connections = int(self.request.get('net_connections'))
+        heartbeat.issue_detected = False
         heartbeat.net_connections = connections
-        heartbeat.put()
+        key2 = heartbeat.put()
         self.response.out.write('Hello ' + name + ' Your Tor Pid is: ' + str(pid))
-        heartbeat_check(name, pid)
+        heartbeat_check(name, pid, pre_entry, key2)
 
-def heartbeat_check(connections, pid):
+def heartbeat_check(connections, pid, pre_entry, key2):
+    this_entry = key2.get()
     if pid == False:
-        fcm_send('Tor process is down')
+        if pre_entry.issue_detected == False:
+            fcm_send('Tor process is down')
+            this_entry.issue_detected = True
+            this_entry.put()
+        if pre_entry.issue_detected == True:
+            this_entry.issue_detected = True
+            this_entry.put()
     # Compare this to previous heartbeat (drop/change -> new will be low)
     # What I really want is bandwidth measure
     elif connections < 3:
         fcm_send('Drop in Tor traffic')
+        this_entry.issue_detected = True
+        this_entry.put()
+    else:
+        this_entry.issue_detected = False
+        this_entry.put()
 
 def fcm_send(title):
     push_service = FCMNotification(api_key="")
