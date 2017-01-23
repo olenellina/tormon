@@ -21,7 +21,7 @@ class Heartbeats(ndb.Model):
     # guard = ndb.BooleanProperty()
     tor_pid = ndb.BooleanProperty()
     net_connections = ndb.IntegerProperty()
-    server_down = ndb.BooleanProperty()
+    server_responsive = ndb.BooleanProperty()
     low_connections = ndb.BooleanProperty()
     tor_down = ndb.BooleanProperty()
 
@@ -36,7 +36,7 @@ class MainPageHandler(webapp2.RequestHandler):
         "check_in": last_check,
         "tor_pid": last.tor_pid,
         "net_connections": last.net_connections,
-        "server_responsive": last.server_down
+        "server_responsive": last.server_responsive
         }
         self.response.out.write(json.dumps(dmp))
 
@@ -52,7 +52,7 @@ class MainPageHandler(webapp2.RequestHandler):
         heartbeat.tor_pid = pid
         heartbeat.last_check_in = datetime.now()
         connections = int(self.request.get('net_connections'))
-        heartbeat.server_down = False
+        heartbeat.server_responsive = True
         heartbeat.low_connections = False
         heartbeat.tor_down = False
         heartbeat.net_connections = connections
@@ -89,43 +89,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/', handler=MainPageHandler, name='home'),
     ],
     debug=True)
-
-# Old Code:
-
-#              https://fcm.googleapis.com/fcm/send
-# Content-Type:application/json
-# Authorization:key=
-#
-# { "data": {
-#     "score": "5x1",
-#     "time": "15:10"
-#   },
-#   "to" : "..."
-# }
-
-#       def UpdateRegisteredClients(ujd):
-# # Skip if the user has not registered for GCM
-# if len(ujd.registration_ids) == 0:
-#   return
-# heartbeat = {
-#   # No need to send every message, we only send a message saying we need to
-#   # sync.
-#   "collapse_key": "new_entry",
-#   # No need to wake the device.
-#   "delay_while_idle": True,
-#   "registration_ids": ujd.registration_ids
-# }
-# response = urlfetch.fetch(
-#     url="https://android.googleapis.com/gcm/send",
-#     payload=json.dumps(heartbeat),
-#     method=urlfetch.POST,
-#     headers={
-#         'Content-Type': 'application/json',
-#         'Authorization': 'key='
-#     })
-# logging.info('push: ' + str(response.status_code) + ': ' + response.content)
-
-
-# Android data pulls
 
 # To push new version to app engine /usr/local/google_appengine/appcfg.py --noauth_local_webserver --oauth2 update ./
