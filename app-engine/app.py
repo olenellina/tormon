@@ -21,7 +21,9 @@ class Heartbeats(ndb.Model):
     # guard = ndb.BooleanProperty()
     tor_pid = ndb.BooleanProperty()
     net_connections = ndb.IntegerProperty()
-    issue_detected = ndb.BooleanProperty()
+    server_down = ndb.BooleanProperty()
+    low_connections = ndb.BooleanProperty()
+    tor_down = ndb.BooleanProperty()
 
 class MainPageHandler(webapp2.RequestHandler):
     # JSON.dumps(status data) --> look at class entry_to_object65785467095767-94
@@ -33,7 +35,8 @@ class MainPageHandler(webapp2.RequestHandler):
         "name": last.name,
         "check_in": last_check,
         "tor_pid": last.tor_pid,
-        "net_connections": last.net_connections
+        "net_connections": last.net_connections,
+        "server_responsive": last.server_down
         }
         self.response.out.write(json.dumps(dmp))
 
@@ -49,7 +52,9 @@ class MainPageHandler(webapp2.RequestHandler):
         heartbeat.tor_pid = pid
         heartbeat.last_check_in = datetime.now()
         connections = int(self.request.get('net_connections'))
-        heartbeat.issue_detected = False
+        heartbeat.server_down = False
+        heartbeat.low_connections = False
+        heartbeat.tor_down = False
         heartbeat.net_connections = connections
         key2 = heartbeat.put()
         self.response.out.write('Hello ' + name + ' Your Tor Pid is: ' + str(pid))
@@ -57,31 +62,27 @@ class MainPageHandler(webapp2.RequestHandler):
 
 def heartbeat_check(connections, pid, pre_entry, key2):
     this_entry = key2.get()
-    if pid == False:
-        if pre_entry.issue_detected == False:
-            fcm_send('Tor process is down')
-            this_entry.issue_detected = True
-            this_entry.put()
-        if pre_entry.issue_detected == True:
-            this_entry.issue_detected = True
-            this_entry.put()
-    # Compare this to previous heartbeat (drop/change -> new will be low)
-    # What I really want is bandwidth measure
-    elif connections < 3:
+    if pid == False and pre_entry.tor_down == False:
+        fcm_send('Tor process is down')
+        this_entry.tor_down = True
+        this_entry.put()
+    elif pid == False and pre_entry.tor_down == True:
+        this_entry.tor_down = True
+        this_entry.put()
+    if connections < 3 and pre_entry.low_connections == False:
         fcm_send('Drop in Tor traffic')
-        this_entry.issue_detected = True
+        this_entry.low_connections = True
         this_entry.put()
-    else:
-        this_entry.issue_detected = False
+    elif connections < 3 and pre_entry.low_connections == True:
+        this_entry.tor_down = True
         this_entry.put()
+
 
 def fcm_send(title):
     push_service = FCMNotification(api_key="")
-
     message_title = "Tor relay status"
     message_body = title
     firebase_response = push_service.notify_single_device(registration_id="", message_title=message_title, message_body=message_body)
-
 
 # Web App 2 framework stuff (when a request comes in on this path, hand it off to this thing):
 app = webapp2.WSGIApplication([
