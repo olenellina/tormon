@@ -12,9 +12,12 @@ class MainPageHandler(webapp2.RequestHandler):
         current_time = datetime.now()
         diff = current_time - last.last_check_in
         min_diff = diff.total_seconds() / 60
-        if min_diff > 3 and last.server_down == False and last.name == "Testing":
+        if min_diff > 3 and last.server_responsive == True and last.name == "Testing":
             app.fcm_send("Tor server unresponsive")
-            last.server_down = True
+            last.server_responsive = False
+            last.put()
+        else:
+            last.server_responsive = True
             last.put()
         self.response.out.write(min_diff)
 
