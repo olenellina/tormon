@@ -31,12 +31,16 @@ class MainPageHandler(webapp2.RequestHandler):
         query = Heartbeats.query()
         last = query.order(-Heartbeats.last_check_in).get()
         last_check = last.last_check_in.strftime('%m/%d/%Y %H:%M:%S %Z')
+        current_time = datetime.now()
+        diff = current_time - last.last_check_in
+        min_diff = diff.total_seconds() / 60
         dmp = {
         "name": last.name,
         "check_in": last_check,
         "tor_pid": last.tor_pid,
         "net_connections": last.net_connections,
-        "server_responsive": last.server_responsive
+        "server_responsive": last.server_responsive,
+        "min_diff": int(round(min_diff))
         }
         self.response.out.write(json.dumps(dmp))
 
