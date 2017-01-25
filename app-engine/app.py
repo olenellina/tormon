@@ -7,10 +7,6 @@ from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 import json
 
-# Create an alert attribute that I flip/flop based on notification status
-# Prevents mutliple alerts from driving someone crazy if they already know something is down
-
-# Ask Rhett to explain datastore model
 class TorRelays(ndb.Model):
     name = ndb.StringProperty()
 
@@ -18,7 +14,7 @@ class Heartbeats(ndb.Model):
     # tor_relay = ndb.KeyProperty(kind=TorRelays)
     name = ndb.StringProperty()
     last_check_in = ndb.DateTimeProperty()
-    # guard = ndb.BooleanProperty()
+    guard = ndb.BooleanProperty()
     tor_pid = ndb.BooleanProperty()
     net_connections = ndb.IntegerProperty()
     server_responsive = ndb.BooleanProperty()
@@ -26,7 +22,6 @@ class Heartbeats(ndb.Model):
     tor_down = ndb.BooleanProperty()
 
 class MainPageHandler(webapp2.RequestHandler):
-    # JSON.dumps(status data) --> look at class entry_to_object65785467095767-94
     def get(self):
         query = Heartbeats.query()
         last = query.order(-Heartbeats.last_check_in).get()
@@ -40,7 +35,8 @@ class MainPageHandler(webapp2.RequestHandler):
         "tor_pid": last.tor_pid,
         "net_connections": last.net_connections,
         "server_responsive": last.server_responsive,
-        "min_diff": int(round(min_diff))
+        "min_diff": int(round(min_diff)),
+        "guard": last.guard
         }
         self.response.out.write(json.dumps(dmp))
 
@@ -53,6 +49,11 @@ class MainPageHandler(webapp2.RequestHandler):
             pid = True
         else:
             pid = False
+        if self.request.get('guard') == "True":
+            guard_status = True
+        else:
+            guard_status = False
+        heartbeat.guard = guard_status
         heartbeat.tor_pid = pid
         heartbeat.last_check_in = datetime.now()
         connections = int(self.request.get('net_connections'))
@@ -88,7 +89,6 @@ def fcm_send(title):
     message_body = title
     firebase_response = push_service.notify_single_device(registration_id="", message_title=message_title, message_body=message_body)
 
-# Web App 2 framework stuff (when a request comes in on this path, hand it off to this thing):
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/', handler=MainPageHandler, name='home'),
     ],
