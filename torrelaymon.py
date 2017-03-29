@@ -3,7 +3,7 @@
 # Needs to answer four questions:
 # Is the Tor pid (or pids) running? (complete)
 # What are the network stats? (complete)
-# Does relay appear offline to Tor?
+# Does relay appear offline to Tor? (complete - handled by status cron on appengine)
 # What are my relays flags (am I a guard?)?
 
 import psutil
