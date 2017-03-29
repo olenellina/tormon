@@ -11,6 +11,7 @@ def get_time():
     diff = current_time - old_time
     # minutesDiff = daysDiff * 24 * 60
     print(divmod(diff.total_seconds(), 60))
+    print(int(round(26.3298672)))
 
 if __name__ == '__main__':
     get_time()
